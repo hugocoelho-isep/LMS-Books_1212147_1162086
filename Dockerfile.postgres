@@ -1,0 +1,5 @@
+# Use the official PostgreSQL image
+FROM postgres:14
+
+# Copy the custom init script
+COPY init-db.sh /docker-entrypoint-initdb.d/

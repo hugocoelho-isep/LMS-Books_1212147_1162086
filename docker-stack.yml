@@ -1,0 +1,21 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    deploy:
+      replicas: 1
+    ports:
+      - "5672:5672"		#	RabbitMQ	main	port
+      - "15672:15672"		#	RabbitMQ	management	UI
+    environment:
+      RABBITMQ_DEFAULT_USER:	guest
+      RABBITMQ_DEFAULT_PASS:	guest
+    networks:
+      - lms_overlay_attachable_network
+#
+#networks:
+#  lms_network:
+#    driver: overlay
+networks:
+  lms_overlay_attachable_network:
+    external: true
