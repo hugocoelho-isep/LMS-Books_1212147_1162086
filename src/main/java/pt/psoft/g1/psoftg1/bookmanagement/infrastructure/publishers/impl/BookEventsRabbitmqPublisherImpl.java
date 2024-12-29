@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pt.psoft.g1.psoftg1.bookmanagement.api.BookViewAMQP;
 import pt.psoft.g1.psoftg1.bookmanagement.api.BookViewAMQPMapper;
@@ -14,14 +15,20 @@ import pt.psoft.g1.psoftg1.bookmanagement.publishers.BookEventsPublisher;
 import pt.psoft.g1.psoftg1.shared.model.BookEvents;
 
 @Service
-@RequiredArgsConstructor
 public class BookEventsRabbitmqPublisherImpl implements BookEventsPublisher {
 
-    @Autowired
     private RabbitTemplate template;
-    @Autowired
     private DirectExchange direct;
     private final BookViewAMQPMapper bookViewAMQPMapper;
+
+    public BookEventsRabbitmqPublisherImpl(
+            RabbitTemplate template,
+            @Qualifier("bookDirectExchange") DirectExchange direct,
+            BookViewAMQPMapper bookViewAMQPMapper) {
+        this.template = template;
+        this.direct = direct;
+        this.bookViewAMQPMapper = bookViewAMQPMapper;
+    }
 
     private int count = 0;
 

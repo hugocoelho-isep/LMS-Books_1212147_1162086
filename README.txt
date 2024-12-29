@@ -34,3 +34,25 @@ Running:
     (7 rows)
     postgres=# exit
 > docker compose up
+
+
+
+Using docker stack
+
+Create a network:
+> docker network create --driver=overlay --attachable lms_overlay_attachable_network
+
+Init:
+> docker swarm init
+
+Deploy:
+> docker stack deploy -c docker-stack.yml lmsbooks
+
+Remove:
+> docker stack rm lmsbooks
+
+Script to create databases and lmsbooks service:
+> ./run.sh
+
+Script to remove databases and lmsbooks service:
+> ./shutdown.sh

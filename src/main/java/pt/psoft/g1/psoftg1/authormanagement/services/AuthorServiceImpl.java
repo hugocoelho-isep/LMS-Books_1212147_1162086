@@ -6,9 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pt.psoft.g1.psoftg1.authormanagement.api.AuthorLendingView;
+import pt.psoft.g1.psoftg1.authormanagement.api.AuthorViewAMQP;
 import pt.psoft.g1.psoftg1.authormanagement.model.Author;
+import pt.psoft.g1.psoftg1.authormanagement.publishers.AuthorEventsPublisher;
 import pt.psoft.g1.psoftg1.authormanagement.repositories.AuthorRepository;
 import pt.psoft.g1.psoftg1.bookmanagement.model.Book;
+import pt.psoft.g1.psoftg1.bookmanagement.publishers.BookEventsPublisher;
 import pt.psoft.g1.psoftg1.bookmanagement.repositories.BookRepository;
 import pt.psoft.g1.psoftg1.exceptions.NotFoundException;
 import pt.psoft.g1.psoftg1.shared.repositories.PhotoRepository;
@@ -23,6 +26,8 @@ public class AuthorServiceImpl implements AuthorService {
     private final BookRepository bookRepository;
     private final AuthorMapper mapper;
     private final PhotoRepository photoRepository;
+
+    private final AuthorEventsPublisher authorEventsPublisher;
 
     @Override
     public Iterable<Author> findAll() {
@@ -57,6 +62,25 @@ public class AuthorServiceImpl implements AuthorService {
             resource.setPhotoURI(null);
         }
         final Author author = mapper.create(resource);
+
+        Author savedAuthor = authorRepository.save(author);
+
+        if( savedAuthor!=null ) {
+            authorEventsPublisher.sendAuthorCreated(savedAuthor);
+        }
+
+        return savedAuthor;
+    }
+
+    @Override
+    public Author create(AuthorViewAMQP authorViewAMQP) {
+        final Long authorNumber = authorViewAMQP.getAuthorNumber();
+        final String name = authorViewAMQP.getName();
+        final String bio = authorViewAMQP.getBio();
+        final String photo = authorViewAMQP.getPhoto();
+
+        final Author author = new Author(authorNumber, name, bio, photo);
+
         return authorRepository.save(author);
     }
 
@@ -88,6 +112,30 @@ public class AuthorServiceImpl implements AuthorService {
         // in the meantime some other user might have changed this object on the
         // database, so concurrency control will still be applied when we try to save
         // this updated object
+        Author updatedAuthor = authorRepository.save(author);
+
+        if( updatedAuthor!=null ) {
+            authorEventsPublisher.sendAuthorUpdated(updatedAuthor, desiredVersion);
+        }
+
+        return updatedAuthor;
+    }
+
+    @Override
+    public Author partialUpdate(AuthorViewAMQP authorViewAMQP) {
+
+        final long desiredVersion = authorViewAMQP.getVersion();
+        final long authorNumber = authorViewAMQP.getAuthorNumber();
+        final String name = authorViewAMQP.getName();
+        final String bio = authorViewAMQP.getBio();
+        final String photoUri = authorViewAMQP.getPhoto();
+
+
+        final var author = findByAuthorNumber(authorNumber)
+                .orElseThrow(() -> new NotFoundException("Cannot update an object that does not yet exist"));
+
+        author.applyPatch(desiredVersion, name, bio, photoUri);
+
         return authorRepository.save(author);
     }
 
@@ -109,7 +157,11 @@ public class AuthorServiceImpl implements AuthorService {
         String photoFile = author.getPhoto().getPhotoFile();
         author.removePhoto(desiredVersion);
         Optional<Author> updatedAuthor = Optional.of(authorRepository.save(author));
-        photoRepository.deleteByPhotoFile(photoFile);
+
+        if( updatedAuthor.isPresent() ) {
+            photoRepository.deleteByPhotoFile(photoFile);
+            authorEventsPublisher.sendAuthorUpdated(updatedAuthor.get(), desiredVersion);
+        }
         return updatedAuthor;
     }
 
