@@ -13,7 +13,7 @@ import pt.psoft.g1.psoftg1.shared.model.BookEvents;
 @Configuration
 public  class RabbitmqClientConfig {
 
-    @Bean
+    @Bean(name = "bookDirectExchange")
     public DirectExchange direct() {
         return new DirectExchange("LMS.books");
     }
@@ -37,31 +37,31 @@ public  class RabbitmqClientConfig {
             return new AnonymousQueue();
         }
 
-        @Bean
-        public Binding binding1(DirectExchange direct,
+        @Bean(name = "binding1_books")
+        public Binding binding1(@Qualifier("bookDirectExchange") DirectExchange direct,
                                 @Qualifier("autoDeleteQueue_Book_Created") Queue autoDeleteQueue_Book_Created) {
             return BindingBuilder.bind(autoDeleteQueue_Book_Created)
                     .to(direct)
                     .with(BookEvents.BOOK_CREATED);
         }
 
-        @Bean
-        public Binding binding2(DirectExchange direct,
+        @Bean(name = "binding2_books")
+        public Binding binding2(@Qualifier("bookDirectExchange") DirectExchange direct,
                                 Queue autoDeleteQueue_Book_Updated) {
             return BindingBuilder.bind(autoDeleteQueue_Book_Updated)
                     .to(direct)
                     .with(BookEvents.BOOK_UPDATED);
         }
 
-        @Bean
-        public Binding binding3(DirectExchange direct,
+        @Bean(name = "binding3_books")
+        public Binding binding3(@Qualifier("bookDirectExchange") DirectExchange direct,
                                 Queue autoDeleteQueue_Book_Deleted) {
             return BindingBuilder.bind(autoDeleteQueue_Book_Deleted)
                     .to(direct)
                     .with(BookEvents.BOOK_DELETED);
         }
 
-        @Bean
+        @Bean(name = "bookReceiver")
         public BookEventRabbitmqReceiver receiver(BookService bookService, @Qualifier("autoDeleteQueue_Book_Created") Queue autoDeleteQueue_Book_Created) {
             return new BookEventRabbitmqReceiver(bookService);
         }

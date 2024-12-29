@@ -10,7 +10,7 @@ else
 fi
 
 db_base_name="books_db_"
-db_base_port=58000
+db_base_port=55000
 
 # Check the latest DB instance
 latest_i=$(docker ps --filter "name=^${db_base_name}[1-9][0-9]*$" --format "{{.Names}}" | sort -V | tail -n 1 | grep -oE '[0-9]+$')
