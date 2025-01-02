@@ -74,7 +74,7 @@ public class BookController {
     @Operation(summary = "Updates a specific Book")
     @PatchMapping(value = "/{isbn}")
     public ResponseEntity<BookView> updateBook(@PathVariable final String isbn, final WebRequest request,
-                                               @Valid final UpdateBookRequest resource) {
+                                               @Valid @RequestBody UpdateBookRequest resource) {
 
         final String ifMatchValue = request.getHeader(ConcurrencyService.IF_MATCH);
         if (ifMatchValue == null || ifMatchValue.isEmpty() || ifMatchValue.equals("null")) {
