@@ -70,10 +70,10 @@ else
     --env spring.datasource.url=jdbc:postgresql://books_db_{{.Task.Slot}}:5432/postgres \
     --env spring.datasource.username=postgres \
     --env spring.datasource.password=password \
-    --env file.upload-dir=/tmp/uploads-psoft-g1-instance{{.Task.Slot}} \
+    --env file.upload-dir=/Users/miguelcarvalho/SomeDirectory/uploads-psoft-g1-instance{{.Task.Slot}} \
     --env spring.rabbitmq.host=rabbitmq \
-    --mount type=bind,source=/c/Users/hugo/SomeDirectory,target=/tmp/uploads-psoft-g1-instance{{.Task.Slot}} \
-    --publish 8087:8080 \
+--mount type=bind,source=/Users/miguelcarvalho/SomeDirectory,target=/tmp/uploads-psoft-g1-instance{{.Task.Slot}} \
+--publish 8087:8080 \
     --network lms_overlay_attachable_network \
     lmsbooks:latest
 

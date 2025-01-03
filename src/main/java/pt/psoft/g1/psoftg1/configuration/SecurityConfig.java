@@ -118,6 +118,7 @@ public class SecurityConfig {
                 //.requestMatchers(HttpMethod.GET, "/api/books/suggestions").hasRole(Role.READER)
                 .requestMatchers(HttpMethod.POST, "/api/books/search").hasAnyRole(Role.LIBRARIAN, Role.READER)
                 // endBooks
+                .requestMatchers(HttpMethod.POST, "/api/suggested-books/isbn").hasAnyRole(Role.READER)
 //                // genres
 //                .requestMatchers(HttpMethod.GET, "/api/genres/top5").hasRole(Role.LIBRARIAN)
 //                .requestMatchers(HttpMethod.GET, "/api/genres/avgLendings").hasRole(Role.LIBRARIAN)
@@ -129,6 +130,7 @@ public class SecurityConfig {
                 .requestMatchers("/**").hasRole(Role.ADMIN).anyRequest().authenticated()
                 // Set up oauth2 resource server
                 .and().httpBasic(Customizer.withDefaults()).oauth2ResourceServer().jwt();
+
 
         return http.build();
     }

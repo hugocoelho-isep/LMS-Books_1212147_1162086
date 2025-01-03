@@ -8,10 +8,11 @@ import org.springframework.context.annotation.Profile;
 import pt.psoft.g1.psoftg1.bookmanagement.api.BookEventRabbitmqReceiver;
 import pt.psoft.g1.psoftg1.bookmanagement.services.BookService;
 import pt.psoft.g1.psoftg1.shared.model.BookEvents;
+import pt.psoft.g1.psoftg1.shared.model.SuggestedBooksEvents;
 
 @Profile("!test")
 @Configuration
-public  class RabbitmqClientConfig {
+public class RabbitmqClientConfig {
 
     @Bean(name = "bookDirectExchange")
     public DirectExchange direct() {
@@ -22,7 +23,6 @@ public  class RabbitmqClientConfig {
 
         @Bean(name = "autoDeleteQueue_Book_Created")
         public Queue autoDeleteQueue_Book_Created() {
-
             System.out.println("autoDeleteQueue_Book_Created created!");
             return new AnonymousQueue();
         }
@@ -64,6 +64,30 @@ public  class RabbitmqClientConfig {
         @Bean(name = "bookReceiver")
         public BookEventRabbitmqReceiver receiver(BookService bookService, @Qualifier("autoDeleteQueue_Book_Created") Queue autoDeleteQueue_Book_Created) {
             return new BookEventRabbitmqReceiver(bookService);
+        }
+
+        @Bean(name = "autoDeleteQueue_Suggestion_Created")
+        public Queue autoDeleteQueue_Suggestion_Created() {
+            System.out.println("autoDeleteQueue_Suggestion_Created created!");
+            return new AnonymousQueue();
+        }
+
+        @Bean
+        public Queue autoDeleteQueue_Suggestion_Updated() {
+            return new AnonymousQueue();
+        }
+
+        @Bean
+        public Queue autoDeleteQueue_Suggestion_Deleted() {
+            return new AnonymousQueue();
+        }
+
+        @Bean
+        public Binding binding4(@Qualifier("bookDirectExchange") DirectExchange direct,
+                                @Qualifier("autoDeleteQueue_Suggestion_Created") Queue autoDeleteQueue_Suggestion_Created) {
+            return BindingBuilder.bind(autoDeleteQueue_Suggestion_Created)
+                    .to(direct)
+                    .with(SuggestedBooksEvents.SUGGESTION_CREATED);
         }
     }
 }

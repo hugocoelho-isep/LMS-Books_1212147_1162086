@@ -30,39 +30,40 @@ public class BookEventsRabbitmqPublisherImpl implements BookEventsPublisher {
         this.bookViewAMQPMapper = bookViewAMQPMapper;
     }
 
-    private int count = 0;
-
     @Override
-    public void sendBookCreated(Book book) {
-        sendBookEvent(book, book.getVersion(), BookEvents.BOOK_CREATED);
+    public BookViewAMQP sendBookCreated(Book book) {
+        return sendBookEvent(book, 1L, BookEvents.BOOK_CREATED);
     }
 
     @Override
-    public void sendBookUpdated(Book book, Long currentVersion) {
-        sendBookEvent(book, currentVersion, BookEvents.BOOK_UPDATED);
+    public BookViewAMQP sendBookUpdated(Book book, Long currentVersion) {
+        return sendBookEvent(book, currentVersion, BookEvents.BOOK_UPDATED);
     }
 
     @Override
-    public void sendBookDeleted(Book book, Long currentVersion) {
-        sendBookEvent(book, currentVersion, BookEvents.BOOK_DELETED);
+    public BookViewAMQP sendBookDeleted(Book book, Long currentVersion) {
+        return sendBookEvent(book, currentVersion, BookEvents.BOOK_DELETED);
     }
 
-    public void sendBookEvent(Book book, Long currentVersion, String bookEventType) {
+    private BookViewAMQP sendBookEvent(Book book, Long currentVersion, String bookEventType) {
+
+        System.out.println("Send Book event to AMQP Broker: " + book.getTitle());
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             BookViewAMQP bookViewAMQP = bookViewAMQPMapper.toBookViewAMQP(book);
             bookViewAMQP.setVersion(currentVersion);
 
-            String jsonString = objectMapper.writeValueAsString(bookViewAMQP);
+            ObjectMapper objectMapper = new ObjectMapper();
+            String bookViewAMQPinString = objectMapper.writeValueAsString(bookViewAMQP);
 
-            this.template.convertAndSend(direct.getName(), bookEventType, jsonString);
+            this.template.convertAndSend(direct.getName(), bookEventType, bookViewAMQPinString);
 
-            System.out.println(" [x] Sent '" + jsonString + "'");
+            return bookViewAMQP;
         }
         catch( Exception ex ) {
             System.out.println(" [x] Exception sending book event: '" + ex.getMessage() + "'");
+
+            return null;
         }
     }
 }
