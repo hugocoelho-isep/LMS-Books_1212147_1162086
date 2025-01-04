@@ -1,5 +1,4 @@
 package pt.psoft.g1.psoftg1.shared.api;
-
 import org.mapstruct.Named;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pt.psoft.g1.psoftg1.authormanagement.model.Author;
@@ -45,8 +44,9 @@ public abstract class MapperInterface {
     protected Map<String, String> mapAuthorLink(Author author) {
         Map<String, String> authorLink = new HashMap<>();
         String authorUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/authors/")
-                .path(author.getAuthorNumber().toString()).toUriString();
+                .path(author.getAuthorNumber()+"").toUriString();
         authorLink.put("href", authorUri);
         return authorLink;
     }
 }
+

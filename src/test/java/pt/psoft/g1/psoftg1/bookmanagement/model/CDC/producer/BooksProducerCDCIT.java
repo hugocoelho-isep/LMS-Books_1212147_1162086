@@ -61,7 +61,7 @@ public class BooksProducerCDCIT {
     @MockBean
     RabbitTemplate template;
 
-    @MockBean
+    @MockBean (name = "bookDirectExchange")
     DirectExchange direct;
 
     @TestTemplate
