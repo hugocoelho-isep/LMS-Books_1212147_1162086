@@ -71,62 +71,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Green Environment') {
-            steps {
-                echo "Deploying Green Environment..."
-                sh """
-                docker run --name ${GREEN_CONTAINER_NAME} -d -p ${GREEN_PORT}:${HOST_PORT} ${IMAGE_NAME}
-                sleep 30
 
-                """
-            }
-        }
-
-//         stage('Notify User for Approval') {
-//             steps {
-//                 emailext (
-//                     subject: "Authnusers Jenkins Local Pipeline - Deployment Ready",
-//                     body: """The authnusers local pipeline has successfully built and pushed the Docker image.
-//                             Please approve the deployment in Jenkins to continue.""",
-//                     to: '1162086@isep.ipp.pt'
-//                 )
-//             }
-//         }
-//
-//         stage('Wait for Approval') {
-//             steps {
-//                 script {
-//                     catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-//                         echo "The pipeline is waiting for your approval. Please click on the link below to proceed or abort the deployment."
-//                         def userInput = input(
-//                             message: "Do you want to proceed with the deployment?",
-//                             parameters: [
-//                                 choice(name: 'Approve Deployment', choices: ['Yes', 'No'], description: 'Select Yes to continue or No to abort.')
-//                             ]
-//                         )
-//                         if (userInput == 'No') {
-//                             currentBuild.result = 'ABORTED'
-//                             error("Deployment aborted by user.")
-//
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Deploy') {
-//             steps {
-//                 script {
-//                     catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-//                         // Add execute permissions to the script
-//                         sh 'chmod +x ./run.sh'
-//
-//                         // Run the script with bash
-//                         sh 'bash ./run.sh 2'
-//                     }
-//                 }
-//             }
-//         }
 
     }
 
