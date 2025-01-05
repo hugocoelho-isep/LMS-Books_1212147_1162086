@@ -71,8 +71,8 @@ pipeline {
         stage('Notify User for Approval') {
             steps {
                 emailext (
-                    subject: "Authnusers Jenkins Local Pipeline - Deployment Ready",
-                    body: """The authnusers local pipeline has successfully built and pushed the Docker image.
+                    subject: "LMSBooks Jenkins Local Pipeline - Deployment Ready",
+                    body: """The LMSBooks local pipeline has successfully built and pushed the Docker image.
                             Please approve the deployment in Jenkins to continue.""",
                     to: '1162086@isep.ipp.pt'
                 )
