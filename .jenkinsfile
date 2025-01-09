@@ -39,7 +39,9 @@ pipeline {
 
         stage('Running Tests') {
             steps {
-                bat "${MAVEN_HOME}\bin\mvn test"
+                script {
+                    sh 'mvn test'
+                }
             }
         }
 
