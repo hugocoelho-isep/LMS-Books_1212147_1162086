@@ -37,6 +37,12 @@ pipeline {
             }
         }
 
+        stage('Running Tests') {
+            steps {
+                bat "${MAVEN_HOME}\bin\mvn test"
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -74,7 +80,7 @@ pipeline {
                     subject: "LMSBooks Jenkins Local Pipeline - Deployment Ready",
                     body: """The LMSBooks local pipeline has successfully built and pushed the Docker image.
                             Please approve the deployment in Jenkins to continue.""",
-                    to: '1162086@isep.ipp.pt'
+                    to: '1162086@isep.ipp.pt,1212147@isep.ipp.pt'
                 )
             }
         }
